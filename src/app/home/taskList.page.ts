@@ -9,7 +9,7 @@ import { Platform } from '@ionic/angular';
 @Component({
   selector: 'app-taskList',
   templateUrl: 'taskList.page.html',
-  styleUrls: ['taskList.page.scss'],
+  styleUrls: ['taskList.page.css'],
 })
 export class TaskListPage {
   tasks: Observable<any[]>;
@@ -48,12 +48,29 @@ export class TaskListPage {
     }
   }
     markAsDone(slidingItem: IonItemSliding, task: Task) {
-      task.status = "done";
-      this.taskList.update(task.id, task)
+      task.status = task.status === 'done' ? 'earring' : 'done';
+      this.taskList.update(task.id, task);
       setTimeout(() => { slidingItem.close(); }, 1);
   }
 
     removeTask(slidingItem: IonItemSliding, task: Task) {
+      if (this.platform.is('cordova')) {
+        //Displays a native Dialog window according to background SO look and feel
+        this.dialogs.confirm('¿Esta seguro de eliminar la tarea?', 'Ionic2Do', ['Ok', 'Cancel'])
+            .then(
+                theResult => {
+                    //If Ok button is pressed ...
+                    if (theResult === 1) {
+                        //Removes the task item from the Firebase database
+                        task.status = "removed";
+                        this.taskList.remove(task.id);
+                        setTimeout(() => { slidingItem.close(); }, 1);
+                    }
+                }
+            );
+        //If running platform is not native (local browser for example)
+      } else {
+
       let resp = confirm("¿Esta seguro de eliminar la tarea?");
       if (resp) {
         task.status = "removed";
@@ -61,5 +78,6 @@ export class TaskListPage {
         setTimeout(() => { slidingItem.close(); }, 1);
       }
     }
+  }
 }
 

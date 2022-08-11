@@ -16,14 +16,15 @@
 
 <ion-content padding>
   <ion-list>
-    <ion-item-sliding #slidingItem *ngFor ="let task of tasks  | async">
-      <ion-item [ngClass]="{taksDone: task.status === 'done'}">
+    <ion-item-sliding #slidingItem *ngFor ="let task of tasks  | async" [ngClass]="{taskDone: task.status == 'done'}">
+      <ion-item >
         {{task.title}}
       </ion-item>
 
       <ion-item-options side="start" (ionSwipe)="removeTask(slidingItem, task)">
         <ion-button ion-button icon-only (click)="markAsDone(slidingItem,task)" color="secondary">
-          <ion-icon name="checkmark"></ion-icon>
+          <ion-icon *ngIf="task.status !== 'done'" name="checkmark"></ion-icon>
+          <ion-icon *ngIf="task.status === 'done'" name="close"></ion-icon>
         </ion-button>
         <ion-button ion-button icon-only expandable (click)="removeTask(slidingItem, task)" color="danger">
         <ion-icon name="trash"></ion-icon>
